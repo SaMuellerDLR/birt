@@ -2,9 +2,11 @@ language: java
 jdk:
   - openjdk8
 cache:
-   directories:
+  directories:
     - ~/.m2
 script: mvn -B --global-toolchains travis-maven-toolchain.xml clean package -DskipTests
+install:
+  -
 #before_deploy:
 #    - eval "$(ssh-agent -s)"
 #    - mkdir -p -m 700 /tmp/.sourceforge_ssh
