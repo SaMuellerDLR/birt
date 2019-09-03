@@ -43,6 +43,7 @@ deploy:
 # Deploy Development snapshot builds.
 # --------------------------------------------
 - provider: script
+  skip_cleanup: true
   script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
   on:
     repo: SaMuellerDLR/birt
@@ -51,6 +52,7 @@ deploy:
 # Deploy Release tag builds.
 # --------------------------------------------
 - provider: script
+  skip_cleanup: true
   script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
   on:
     repo: SaMuellerDLR/birt
