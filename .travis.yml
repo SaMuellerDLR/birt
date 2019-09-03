@@ -1,28 +1,57 @@
 language: java
+
 jdk:
 - openjdk8
+
 cache:
   directories:
   - "~/.m2"
+
+addons:
+   # -----------------------------------------------------------
+   # Make the sourceforge hosts known, thus ssh connections will
+   # not ask to accept the finger print of the server
+   # -----------------------------------------------------------
+   ssh_known_hosts: frs.sourceforge.net
+
+
+# -----------------------------------------------------------
+# Perform the actual build.
+# The BIRT build uses a toolchain file to identify the jdk.
+# It needs to be passed as a parameter to maven.
+# -----------------------------------------------------------
 script: mvn -B --global-toolchains travis-maven-toolchain.xml clean package -DskipTests
+
+# -----------------------------------------------------------
+# Trigger the install phase.
+# --------------------------------------------
 install:
 - 
+
+# -----------------------------------------------------------
+# Setup the connection to sourceforge
+# --------------------------------------------
 before_deploy:
 - eval "$(ssh-agent -s)"
 - mkdir -p -m 700 /tmp/.sourceforge_ssh
 - openssl aes-256-cbc -K $encrypted_d2f1c71c33a2_key -iv $encrypted_d2f1c71c33a2_iv -in id_ed25519.enc -out /tmp/.sourceforge_ssh/id_ed25519 -d
 - chmod 600 /tmp/.sourceforge_ssh/id_ed25519
 - ssh-add /tmp/.sourceforge_ssh/id_ed25519
+
 deploy:
+# -----------------------------------------------------------
+# Deploy Development snapshot builds.
+# --------------------------------------------
 - provider: script
-  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/
-    sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
+  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
   on:
     repo: SaMuellerDLR/birt
     branch: development
+# -----------------------------------------------------------
+# Deploy Release tag builds.
+# --------------------------------------------
 - provider: script
-  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/
-    sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
+  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
   on:
     repo: SaMuellerDLR/birt
     tags: true
