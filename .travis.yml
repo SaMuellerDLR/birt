@@ -20,3 +20,11 @@ deploy:
     branch: development
    script: #
     - rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
+    
+deploy:
+  provider: script
+  on:
+    repo: SaMuellerDLR/birt
+    tags: true
+   script: #
+    - rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2.updatesite/target/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
