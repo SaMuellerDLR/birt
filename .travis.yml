@@ -20,7 +20,7 @@ addons:
 # The BIRT build uses a toolchain file to identify the jdk.
 # It needs to be passed as a parameter to maven.
 # -----------------------------------------------------------
-script: mvn -B --global-toolchains travis-maven-toolchain.xml clean package -DskipTests
+script: mvn clean package -B --global-toolchains travis-maven-toolchain.xml -DskipTests
 
 # -----------------------------------------------------------
 # Trigger the install phase.
