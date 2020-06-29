@@ -7,7 +7,7 @@
 	  <id>JavaSE-1.8</id>
     </provides>
     <configuration>
-      <jdkHome>/usr/lib/jvm/java-8-openjdk-amd64</jdkHome>
+      <jdkHome>C:\ProgramData\Miniconda3\Library</jdkHome>
     </configuration>
   </toolchain>
 </toolchains>
