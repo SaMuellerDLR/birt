@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BIRT Report Designer All-in-one" uid="org.eclipse.birt.report.designer.all" application="org.eclipse.ui.ide.workbench" version="4.12.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="BIRT Report Designer All-in-one" uid="org.eclipse.birt.report.designer.all" application="org.eclipse.ui.ide.workbench" version="4.16.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -20,7 +20,6 @@
    <splash
       location="org.eclipse.platform" />
    <launcher>
-      <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
@@ -133,12 +132,13 @@
       <feature id="org.eclipse.wst.xml_userdoc.feature"/>
       <feature id="org.eclipse.xsd.edit"/>
       <feature id="org.eclipse.xsd"/>
+      <feature id="org.eclipse.ecf.filetransfer.httpclient45.feature" installMode="root"/>
    </features>
 
    <configurations>
+      <plugin id="org.apache.felix.scr" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
-      <plugin id="org.apache.felix.scr" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />

@@ -1,5 +1,7 @@
 language: java
 
+dist: xenial
+
 jdk:
 - openjdk8
 
@@ -20,13 +22,13 @@ addons:
 # The BIRT build uses a toolchain file to identify the jdk.
 # It needs to be passed as a parameter to maven.
 # -----------------------------------------------------------
-script: mvn -B --global-toolchains travis-maven-toolchain.xml clean package -DskipTests
+script: mvn clean package -B --global-toolchains travis-maven-toolchain.xml -DskipTests
 
 # -----------------------------------------------------------
 # Trigger the install phase.
 # --------------------------------------------
 install:
-- 
+- true
 
 # -----------------------------------------------------------
 # Setup the connection to sourceforge
@@ -43,7 +45,6 @@ deploy:
 # Deploy Development snapshot builds.
 # --------------------------------------------
 - provider: script
-  skip_cleanup: true
   script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
   on:
     repo: SaMuellerDLR/birt
@@ -52,7 +53,6 @@ deploy:
 # Deploy Release tag builds.
 # --------------------------------------------
 - provider: script
-  skip_cleanup: true
   script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
   on:
     repo: SaMuellerDLR/birt

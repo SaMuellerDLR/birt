@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BIRT Web Viewer
 Bundle-SymbolicName: org.eclipse.birt.report.viewer; singleton:=true
-Bundle-Version: 4.12.0.qualifier
+Bundle-Version: 4.16.0.qualifier
 Bundle-ClassPath: ., viewer.jar,
  birt/WEB-INF/classes,
  birt/WEB-INF/lib/viewservlets.jar
@@ -10,10 +10,10 @@ Bundle-Activator: org.eclipse.birt.report.viewer.ViewerPlugin
 Bundle-Vendor: Eclipse BIRT Project
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: javax.servlet;version="2.4.0",
- javax.servlet.http;version="2.4.0",
- javax.servlet.jsp;version="2.0.0",
- javax.servlet.jsp.tagext;version="2.0.0",
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ javax.servlet.jsp,
+ javax.servlet.jsp.tagext,
  org.apache.commons.codec.binary,
  org.apache.commons.logging,
  org.eclipse.equinox.http.jetty,
