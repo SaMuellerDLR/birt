@@ -46,12 +46,11 @@ before_deploy:
 # apparently perform a git fetch before, and overwrite the
 # moved tag back to the previous state.
 #------------------------------------------------------------
-- |
-  if [ $TRAVIS_BRANCH == "feature/task_9-Upload_BIRT_product_to_" && $TRAVIS_PULL_REQUEST == "false" ]; then
-     git tag -f development_snapshot
-     git remote add github-mtd  https://${GITHUB_API_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
-     git push -f github-mtd development_snapshot
-     git remote remove github-mtd
+- if [ $TRAVIS_BRANCH == "feature/task_9-Upload_BIRT_product_to_" && $TRAVIS_PULL_REQUEST == "false" ]; then
+     git tag -f development_snapshot;
+     git remote add github-mtd  https://${GITHUB_API_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git;
+     git push -f github-mtd development_snapshot;
+     git remote remove github-mtd;
   fi
 deploy:
 # -----------------------------------------------------------
