@@ -74,7 +74,7 @@ deploy:
 # Deploy Development product snapshot builds.
 # --------------------------------------------
 - provider: releases
-  token:     
+  api_key:     
    secure: hluaODBN0VJT2ULhcyXo7HFiF53ajr0jg0+BtQrRmoTSuANRvL48Ke3yGtQQ33Q1XiM75Go4GpIYa7SPPvoPIlHL9n+4boxVdM5q+bq64psLVjTC7Bak2P3vqQZinZ/T7S4w19+C8Rq3yh5zVg9ZmxkZXf6Pm05U3hGLgsAVcSSpIFFzRqokiOvIgc5gfVkeyGZ4WdvcV0qnObItPnqtJwGJoGgn4Fc2IErRB9tyj5+wrb8w70U6aBupL18nbur/oV7Nf18i4M9aUnXq42rdzqYlqV3tBkL+uE/I5JBLX2yg2JtFAfJVOjQxNsaBsXNOMs0yWvOGKuGAyWtkZAPV/jQjeD+2cu6Cm7E4yzLBZJBjVHgpEyhKThI7OmmipGzjaEyUyscTnhHpQpY3kJ2TngmJvJAEPkI53C2KhPB1Ba4pKNpep0YUBsE07B8aA1EBzUnNgktKJLLhSP7V3aexKw/bWzxbnw+NWac7Gs9yPypgA7BqKzn4yN5fDqZuXWom6g3h8okxditgadcqoq7jGR9Vx6CqpoI0t+2/a0JGMBg+NHkz28TPYeGdobXilhzUeJWonHCktyJ9C9bgtbEVb9DdttIVkaPf61LZAMxGNzykVgbhxfJ4EUvGhDxn3i/By/1aFPG7sHdixFdUh5CDuLjdp+oteITCG4nkTFaqe1Y=
   file_glob: true
   file: 
