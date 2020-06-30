@@ -99,7 +99,7 @@ deploy:
   - build/birt-packages/birt-report-all-in-one/target/products/*.zip
   name: BIRT Release Build
   release_notes: Release build on latest commit by Travis CI - $TRAVIS_BRANCH ($TRAVIS_COMMIT) - $(date +'%F %T %Z').
-  prerelease: true
+  prerelease: false
   target_commitish: $TRAVIS_COMMIT
   on:
     repo: SaMuellerDLR/birt
