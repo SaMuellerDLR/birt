@@ -86,4 +86,4 @@ deploy:
   target_commitish: $TRAVIS_COMMIT
   on:
     repo: SaMuellerDLR/birt
-    branch: development
+    branch: feature/task_9-Upload_BIRT_product_to_
