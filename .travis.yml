@@ -69,6 +69,7 @@ deploy:
   on:
     repo: SaMuellerDLR/birt
     tags: true
+    branch: master
 # -----------------------------------------------------------
 # Deploy Development product snapshot builds.
 # --------------------------------------------
@@ -104,4 +105,4 @@ deploy:
   on:
     repo: SaMuellerDLR/birt
     tags: true
-    condition: $TRAVIS_TAG =~ /^Release/$
+    branch: master
