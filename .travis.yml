@@ -1,9 +1,107 @@
 language: java
+os: linux
+dist: xenial
+
 jdk:
-  - openjdk8
+- openjdk8
+
 cache:
   directories:
-    - ~/.m2
-script: mvn -B --global-toolchains travis-maven-toolchain.xml clean package -DskipTests
+  - "~/.m2"
+
+addons:
+  # -----------------------------------------------------------
+  # Make the sourceforge hosts known, thus ssh connections will
+  # not ask to accept the finger print of the server
+  # -----------------------------------------------------------
+  ssh_known_hosts: frs.sourceforge.net
+
+# -----------------------------------------------------------
+# Perform the actual build.
+# The BIRT build uses a toolchain file to identify the jdk.
+# It needs to be passed as a parameter to maven.
+# -----------------------------------------------------------
+script: mvn clean package -B --global-toolchains travis-maven-toolchain.xml -DskipTests
+
+# -----------------------------------------------------------
+# Trigger the install phase.
+# --------------------------------------------
 install:
-  -
+- true
+
+before_deploy:
+# -----------------------------------------------------------
+# Setup the connection to sourceforge
+# --------------------------------------------
+- eval "$(ssh-agent -s)"
+- mkdir -p -m 700 /tmp/.sourceforge_ssh
+- openssl aes-256-cbc -K $encrypted_d2f1c71c33a2_key -iv $encrypted_d2f1c71c33a2_iv -in id_ed25519.enc -out /tmp/.sourceforge_ssh/id_ed25519 -d
+- chmod 600 /tmp/.sourceforge_ssh/id_ed25519
+- ssh-add /tmp/.sourceforge_ssh/id_ed25519
+# -----------------------------------------------------------
+# Update the development tag beforehand
+# And send it back to the origin, otherwise travis will 
+# apparently perform a git fetch before, and overwrite the
+# moved tag back to the previous state.
+#------------------------------------------------------------
+- if [[ $TRAVIS_BRANCH = "development" && $TRAVIS_PULL_REQUEST = "false" ]]; then
+     git tag -f development_snapshot;
+     git remote add github-mtd  https://${GITHUB_API_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git;
+     git push -f github-mtd development_snapshot;
+     git remote remove github-mtd;
+  fi
+deploy:
+# -----------------------------------------------------------
+# Deploy Development p2 snapshot builds.
+# --------------------------------------------
+- provider: script
+  skip_cleanup: true
+  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
+  on:
+    repo: SaMuellerDLR/birt
+    branch: development
+# -----------------------------------------------------------
+# Deploy Release p2 tag builds.
+# --------------------------------------------
+- provider: script
+  skip_cleanup: true
+  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
+  on:
+    repo: SaMuellerDLR/birt
+    tags: true
+# -----------------------------------------------------------
+# Deploy Development product snapshot builds.
+# --------------------------------------------
+- provider: releases
+  api_key:
+    secure: qqYJjgk+hip+NfRCsnYiN08k+v2wnqONHeNtMrdXmU8r7E7dGpElWX7TN6ttgaIETx7bfxSr05Nsgqzn7kvuxuoevvcu7GvYuRWjR2U69wR6ZfsjdOHpEsZDjjgg3/i1mzSytuLKbbCAsDA58Pyvlz9w8QNk1SOV0SzKlvM6MtuT+jPgOnNV3KoRwI6d7hnNcnqs5vHArCKHHfgi3aDgOHi9ZAyVVn71+wYF/I5qF9OsBTcKrs5tDGksVTJq8peV9nMI9DyxAexEpEufei8nG/nyMx00qytDu0zm9AweKWiyUYQqX8LkLn1P7Z+e46ivczdw+Wdu77kE9+88c83OHzvrQTG7B+jl+5hKbFBdVlNUpScLeTtSXBeSBAbXkCYFiK8flo6mLy/PC3TF75qsgflv4te8uHB5YHyGGeT0tNZHxnHIEorzm9BecvR9X5sOHug72Q5PytkdAXQvjTjerjQrD5ByNVab3D3MLEvJjph8bxCmUQndQ7XGqaor99S7UgqQY8emcM8hS99LGhUHw431JRBtbyXHMRM9OjLPWBuzHscWqn0CDBndf9izD3B7WPiwUEX0+a2hlAm0tgb3k3bTlabpKYTCtedIcn/qMysGk1hO6cMfDx291Or+5ULTH0IH70fWUtvEWISm+asjhBEAlY5rxYfqh6FsWGSVSqI=
+  file_glob: true
+  skip_cleanup: true
+  file: 
+  - build/birt-packages/birt-report-all-in-one/target/products/*.zip
+  name: BIRT Development Build
+  release_notes: Development build on latest commit by Travis CI - $TRAVIS_BRANCH ($TRAVIS_COMMIT) - $(date +'%F %T %Z'). This release is subject to constant change.
+  prerelease: true
+  overwrite: true
+  target_commitish: $TRAVIS_COMMIT
+  on:
+    repo: SaMuellerDLR/birt
+    branch: development
+# -----------------------------------------------------------
+# Deploy Release product tag builds.
+# --------------------------------------------
+- provider: releases
+  api_key:
+    secure: qqYJjgk+hip+NfRCsnYiN08k+v2wnqONHeNtMrdXmU8r7E7dGpElWX7TN6ttgaIETx7bfxSr05Nsgqzn7kvuxuoevvcu7GvYuRWjR2U69wR6ZfsjdOHpEsZDjjgg3/i1mzSytuLKbbCAsDA58Pyvlz9w8QNk1SOV0SzKlvM6MtuT+jPgOnNV3KoRwI6d7hnNcnqs5vHArCKHHfgi3aDgOHi9ZAyVVn71+wYF/I5qF9OsBTcKrs5tDGksVTJq8peV9nMI9DyxAexEpEufei8nG/nyMx00qytDu0zm9AweKWiyUYQqX8LkLn1P7Z+e46ivczdw+Wdu77kE9+88c83OHzvrQTG7B+jl+5hKbFBdVlNUpScLeTtSXBeSBAbXkCYFiK8flo6mLy/PC3TF75qsgflv4te8uHB5YHyGGeT0tNZHxnHIEorzm9BecvR9X5sOHug72Q5PytkdAXQvjTjerjQrD5ByNVab3D3MLEvJjph8bxCmUQndQ7XGqaor99S7UgqQY8emcM8hS99LGhUHw431JRBtbyXHMRM9OjLPWBuzHscWqn0CDBndf9izD3B7WPiwUEX0+a2hlAm0tgb3k3bTlabpKYTCtedIcn/qMysGk1hO6cMfDx291Or+5ULTH0IH70fWUtvEWISm+asjhBEAlY5rxYfqh6FsWGSVSqI=
+  file_glob: true
+  skip_cleanup: true
+  file: 
+  - build/birt-packages/birt-report-all-in-one/target/products/*.zip
+  name: BIRT Release Build
+  release_notes: Release build on latest commit by Travis CI - $TRAVIS_BRANCH ($TRAVIS_COMMIT) - $(date +'%F %T %Z').
+  prerelease: true
+  target_commitish: $TRAVIS_COMMIT
+  on:
+    repo: SaMuellerDLR/birt
+    tags: tag
+    condition: "$TRAVIS_TAG =~ ^Release*$"
