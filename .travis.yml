@@ -104,4 +104,4 @@ deploy:
   on:
     repo: SaMuellerDLR/birt
     tags: true
-    condition: $TRAVIS_TAG =~ ^Release*$
+    condition: $TRAVIS_TAG =~ /^Release/$
