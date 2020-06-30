@@ -69,6 +69,7 @@ deploy:
   on:
     repo: SaMuellerDLR/birt
     tags: true
+    branch: master
 # -----------------------------------------------------------
 # Deploy Development product snapshot builds.
 # --------------------------------------------
@@ -99,9 +100,9 @@ deploy:
   - build/birt-packages/birt-report-all-in-one/target/products/*.zip
   name: BIRT Release Build
   release_notes: Release build on latest commit by Travis CI - $TRAVIS_BRANCH ($TRAVIS_COMMIT) - $(date +'%F %T %Z').
-  prerelease: true
+  prerelease: false
   target_commitish: $TRAVIS_COMMIT
   on:
     repo: SaMuellerDLR/birt
-    tags: tag
-    condition: $TRAVIS_TAG =~ ^Release*$
+    tags: true
+    branch: master
