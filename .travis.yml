@@ -103,5 +103,5 @@ deploy:
   target_commitish: $TRAVIS_COMMIT
   on:
     repo: SaMuellerDLR/birt
-    tags: tag
+    tags: true
     condition: $TRAVIS_TAG =~ ^Release*$
