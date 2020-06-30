@@ -1,51 +1,24 @@
 language: java
 os: linux
 dist: xenial
-
 jdk:
 - openjdk8
-
 cache:
   directories:
   - "~/.m2"
-
-addons:
-# -----------------------------------------------------------
-# Make the sourceforge hosts known, thus ssh connections will
-# not ask to accept the finger print of the server
-# -----------------------------------------------------------
+addons: 
 ssh_known_hosts: frs.sourceforge.net
-
-# -----------------------------------------------------------
-# Setup the connection to sourceforge
-# --------------------------------------------
 before_script:
 - eval "$(ssh-agent -s)"
 - mkdir -p -m 700 /tmp/.sourceforge_ssh
-- openssl aes-256-cbc -K $encrypted_d2f1c71c33a2_key -iv $encrypted_d2f1c71c33a2_iv -in id_ed25519.enc -out /tmp/.sourceforge_ssh/id_ed25519 -d
+- openssl aes-256-cbc -K $encrypted_d2f1c71c33a2_key -iv $encrypted_d2f1c71c33a2_iv
+  -in id_ed25519.enc -out /tmp/.sourceforge_ssh/id_ed25519 -d
 - chmod 600 /tmp/.sourceforge_ssh/id_ed25519
 - ssh-add /tmp/.sourceforge_ssh/id_ed25519
-
-# -----------------------------------------------------------
-# Perform the actual build.
-# The BIRT build uses a toolchain file to identify the jdk.
-# It needs to be passed as a parameter to maven.
-# -----------------------------------------------------------
 script: mvn clean package -B --global-toolchains travis-maven-toolchain.xml -DskipTests
-
-# -----------------------------------------------------------
-# Trigger the install phase.
-# --------------------------------------------
 install:
 - true
-
 before_deploy:
-# -----------------------------------------------------------
-# Update the development tag beforehand
-# And send it back to the origin, otherwise travis will 
-# apparently perform a git fetch before, and overwrite the
-# moved tag back to the previous state.
-#------------------------------------------------------------
 - |
   if [ $TRAVIS_BRANCH == "development" && $TRAVIS_PULL_REQUEST == "false" ]; then
      git tag -f development_snapshot
@@ -54,36 +27,11 @@ before_deploy:
      git remote remove github-mtd
   fi
 deploy:
-# -----------------------------------------------------------
-# Deploy Development p2 snapshot builds.
-# --------------------------------------------
-- provider: script
-  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/development/
-  on:
-    repo: SaMuellerDLR/birt
-    branch: development
-# -----------------------------------------------------------
-# Deploy Release p2 tag builds.
-# --------------------------------------------
-- provider: script
-  script: rsync -e ssh -avP --delete $TRAVIS_BUILD_DIR/build/org.eclipse.birt.p2updatesite/target/repository/ sa-mueller-dlr@frs.sourceforge.net:/home/frs/project/birt/release/$TRAVIS_TAG
-  on:
-    repo: SaMuellerDLR/birt
-    tags: true
-# -----------------------------------------------------------
-# Deploy Development product snapshot builds.
-# --------------------------------------------
-- provider: releases
-  api_key:     
-   secure: hluaODBN0VJT2ULhcyXo7HFiF53ajr0jg0+BtQrRmoTSuANRvL48Ke3yGtQQ33Q1XiM75Go4GpIYa7SPPvoPIlHL9n+4boxVdM5q+bq64psLVjTC7Bak2P3vqQZinZ/T7S4w19+C8Rq3yh5zVg9ZmxkZXf6Pm05U3hGLgsAVcSSpIFFzRqokiOvIgc5gfVkeyGZ4WdvcV0qnObItPnqtJwGJoGgn4Fc2IErRB9tyj5+wrb8w70U6aBupL18nbur/oV7Nf18i4M9aUnXq42rdzqYlqV3tBkL+uE/I5JBLX2yg2JtFAfJVOjQxNsaBsXNOMs0yWvOGKuGAyWtkZAPV/jQjeD+2cu6Cm7E4yzLBZJBjVHgpEyhKThI7OmmipGzjaEyUyscTnhHpQpY3kJ2TngmJvJAEPkI53C2KhPB1Ba4pKNpep0YUBsE07B8aA1EBzUnNgktKJLLhSP7V3aexKw/bWzxbnw+NWac7Gs9yPypgA7BqKzn4yN5fDqZuXWom6g3h8okxditgadcqoq7jGR9Vx6CqpoI0t+2/a0JGMBg+NHkz28TPYeGdobXilhzUeJWonHCktyJ9C9bgtbEVb9DdttIVkaPf61LZAMxGNzykVgbhxfJ4EUvGhDxn3i/By/1aFPG7sHdixFdUh5CDuLjdp+oteITCG4nkTFaqe1Y=
-  file_glob: true
-  file: 
-  - build/birt-packages/birt-report-all-in-one/target/products/*.zip
-  name: BIRT Development Build
-  release_notes: Development build on latest commit by Travis CI - $TRAVIS_BRANCH ($TRAVIS_COMMIT) - $(date +'%F %T %Z'). This release is subject to constant change.
-  prerelease: true
-  overwrite: true
-  target_commitish: $TRAVIS_COMMIT
+  provider: releases
+  api_key:
+    secure: qqYJjgk+hip+NfRCsnYiN08k+v2wnqONHeNtMrdXmU8r7E7dGpElWX7TN6ttgaIETx7bfxSr05Nsgqzn7kvuxuoevvcu7GvYuRWjR2U69wR6ZfsjdOHpEsZDjjgg3/i1mzSytuLKbbCAsDA58Pyvlz9w8QNk1SOV0SzKlvM6MtuT+jPgOnNV3KoRwI6d7hnNcnqs5vHArCKHHfgi3aDgOHi9ZAyVVn71+wYF/I5qF9OsBTcKrs5tDGksVTJq8peV9nMI9DyxAexEpEufei8nG/nyMx00qytDu0zm9AweKWiyUYQqX8LkLn1P7Z+e46ivczdw+Wdu77kE9+88c83OHzvrQTG7B+jl+5hKbFBdVlNUpScLeTtSXBeSBAbXkCYFiK8flo6mLy/PC3TF75qsgflv4te8uHB5YHyGGeT0tNZHxnHIEorzm9BecvR9X5sOHug72Q5PytkdAXQvjTjerjQrD5ByNVab3D3MLEvJjph8bxCmUQndQ7XGqaor99S7UgqQY8emcM8hS99LGhUHw431JRBtbyXHMRM9OjLPWBuzHscWqn0CDBndf9izD3B7WPiwUEX0+a2hlAm0tgb3k3bTlabpKYTCtedIcn/qMysGk1hO6cMfDx291Or+5ULTH0IH70fWUtvEWISm+asjhBEAlY5rxYfqh6FsWGSVSqI=
+  file: x
   on:
     repo: SaMuellerDLR/birt
     branch: feature/task_9-Upload_BIRT_product_to_
+  skip_cleanup: 'true'
