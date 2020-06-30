@@ -10,21 +10,11 @@ cache:
   - "~/.m2"
 
 addons:
-# -----------------------------------------------------------
-# Make the sourceforge hosts known, thus ssh connections will
-# not ask to accept the finger print of the server
-# -----------------------------------------------------------
-ssh_known_hosts: frs.sourceforge.net
-
-# -----------------------------------------------------------
-# Setup the connection to sourceforge
-# --------------------------------------------
-before_script:
-- eval "$(ssh-agent -s)"
-- mkdir -p -m 700 /tmp/.sourceforge_ssh
-- openssl aes-256-cbc -K $encrypted_d2f1c71c33a2_key -iv $encrypted_d2f1c71c33a2_iv -in id_ed25519.enc -out /tmp/.sourceforge_ssh/id_ed25519 -d
-- chmod 600 /tmp/.sourceforge_ssh/id_ed25519
-- ssh-add /tmp/.sourceforge_ssh/id_ed25519
+  # -----------------------------------------------------------
+  # Make the sourceforge hosts known, thus ssh connections will
+  # not ask to accept the finger print of the server
+  # -----------------------------------------------------------
+  ssh_known_hosts: frs.sourceforge.net
 
 # -----------------------------------------------------------
 # Perform the actual build.
@@ -40,6 +30,14 @@ install:
 - true
 
 before_deploy:
+# -----------------------------------------------------------
+# Setup the connection to sourceforge
+# --------------------------------------------
+- eval "$(ssh-agent -s)"
+- mkdir -p -m 700 /tmp/.sourceforge_ssh
+- openssl aes-256-cbc -K $encrypted_d2f1c71c33a2_key -iv $encrypted_d2f1c71c33a2_iv -in id_ed25519.enc -out /tmp/.sourceforge_ssh/id_ed25519 -d
+- chmod 600 /tmp/.sourceforge_ssh/id_ed25519
+- ssh-add /tmp/.sourceforge_ssh/id_ed25519
 # -----------------------------------------------------------
 # Update the development tag beforehand
 # And send it back to the origin, otherwise travis will 
